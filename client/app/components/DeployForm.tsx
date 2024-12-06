@@ -1,14 +1,20 @@
 'use client';
 
 import { useSearchParams, useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { deployProject } from "../../services/deployService";
 
 const DeployForm = ({ setDeploymentStatus }: { setDeploymentStatus: (status: string) => void }) => {
     const searchParams = useSearchParams();
     const router = useRouter();
 
-    const githubURL = searchParams.get("githubUrl") || "";
+    // Using state to store the URL input
+    const [githubURL, setGithubURL] = useState(searchParams.get("githubUrl") || "");
+
+    // Effect to update the state when the searchParams change
+    useEffect(() => {
+        setGithubURL(searchParams.get("githubUrl") || "");
+    }, [searchParams]);
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -34,9 +40,10 @@ const DeployForm = ({ setDeploymentStatus }: { setDeploymentStatus: (status: str
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newRepoUrl = e.target.value;
+        setGithubURL(newRepoUrl);
 
         const newSearchParams = new URLSearchParams(searchParams.toString());
-        newSearchParams.set("githubURL", newRepoUrl);
+        newSearchParams.set("githubUrl", newRepoUrl);
 
         router.replace(`?${newSearchParams.toString()}`);
     };
